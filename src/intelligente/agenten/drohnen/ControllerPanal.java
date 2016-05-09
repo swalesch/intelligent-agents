@@ -57,9 +57,7 @@ public class ControllerPanal {
 		AgentController newAgend = cont.acceptNewAgent("HalloWorld", anAgent);
 		newAgend.start();
 
-		// TODO download new Jade Version,
-		// http://jade.tilab.com/download/jade/license/jade-download/?x=43&y=8
-		// add Agend to Sniffer
+		// TODO add Agend to Sniffer, msg may wrong
 		AID address = new AID();
 		address.setName(newAgend.getName());
 		SniffOn sniffOn = new SniffOn();
