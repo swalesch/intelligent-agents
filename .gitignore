@@ -48,3 +48,9 @@ RemoteSystemsTempFiles
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Files that are not repo importend
+MTPs-*.txt
+APDescription.txt
+bin/
+bin\
