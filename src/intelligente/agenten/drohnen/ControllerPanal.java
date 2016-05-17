@@ -1,17 +1,18 @@
 package intelligente.agenten.drohnen;
 
-import intelligente.agenten.jade.HelloWorld;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.SniffOn;
 import jade.lang.acl.ACLMessage;
+import jade.tools.rma.rma;
 import jade.tools.sniffer.Sniffer;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
@@ -19,61 +20,99 @@ import jade.wrapper.StaleProxyException;
 
 public class ControllerPanal {
 
-	public static void main(String[] args)
-			throws StaleProxyException, CodecException, OntologyException {
-		// Get a hold on JADE runtime
-		Runtime rt = Runtime.instance();
-		// Exit the JVM when there are no more containers around
-		rt.setCloseVM(true);
-		System.out.print("runtime created\n");
+	public Runtime _runtime;
+	public AgentContainer _mainContainer;
+	public rma _rmaAgent;
+	public AgentContainer _agentContainer;
+	public Sniffer _sniffer;
 
-		// Create a default profile
-		Profile profile = new ProfileImpl(null, 1200, null);
-		System.out.print("profile created\n");
+	public static ControllerPanal createControllerPanal()
+			throws StaleProxyException {
+		return new ControllerPanal();
+	}
 
-		System.out
-				.println("Launching a whole in-process platform..." + profile);
-		AgentContainer mainContainer = rt.createMainContainer(profile);
+	public void addAndStartAgentAtMainContainer(String name, Agent agendToAdd)
+			throws StaleProxyException {
+		AgentController rmaController = _mainContainer.acceptNewAgent(name,
+				agendToAdd);
+		rmaController.start();
+	}
 
-		// now set the default Profile to start a container
-		ProfileImpl pContainer = new ProfileImpl(null, 1200, null);
-		System.out.println("Launching the agent container ..." + pContainer);
+	private void setupSniffer() throws StaleProxyException {
+		_sniffer = ControllerPanal.getNewSnifferAgent();
+		addAndStartAgentAtMainContainer("sniffer", _sniffer);
+	}
 
-		AgentContainer cont = rt.createAgentContainer(pContainer);
-		System.out.println(
-				"Launching the agent container after ..." + pContainer);
+	public void addAgentToSnifferByName(String agentName)
+			throws CodecException, OntologyException {
+		AID addressToAgentToSniff = new AID();
+		addressToAgentToSniff.setName(agentName);
+		SniffOn sniffOn = createSniffOn(addressToAgentToSniff);
 
-		System.out.println("containers created");
-		System.out.println("Launching the rma agent on the main container ...");
-		AgentController rma = mainContainer.createNewAgent("rma",
-				"jade.tools.rma.rma", new Object[0]);
-		rma.start();
-		Sniffer sniffer = new Sniffer();
-		AgentController snifferController = mainContainer
-				.acceptNewAgent("sniffer", sniffer);
-		snifferController.start();
+		ACLMessage msg = createRequestMessage();
 
-		HelloWorld anAgent = new HelloWorld();
-		AgentController newAgend = cont.acceptNewAgent("HalloWorld", anAgent);
-		newAgend.start();
+		AID snifferAddress = _sniffer.getAID();
+		Action action = new Action(snifferAddress, sniffOn);
+		_rmaAgent.getContentManager().fillContent(msg, action);
+		msg.addReceiver(snifferAddress);
+		_rmaAgent.send(msg);
+	}
 
-		// TODO add Agend to Sniffer, msg may wrong
-		AID address = new AID();
-		address.setName(newAgend.getName());
+	private SniffOn createSniffOn(AID address) {
 		SniffOn sniffOn = new SniffOn();
 		sniffOn.addSniffedAgents(address);
-		sniffOn.setSniffer(sniffer.getAID());
+		sniffOn.setSniffer(_sniffer.getAID());
+		return sniffOn;
+	}
 
+	private void setupMainContainer() {
+		Profile profile = new ProfileImpl(null, 1200, null);
+		_mainContainer = _runtime.createMainContainer(profile);
+	}
+
+	private void setupRuntime() {
+		_runtime = Runtime.instance();
+		_runtime.setCloseVM(true);
+	}
+
+	private void setupRmaAgent() throws StaleProxyException {
+		_rmaAgent = getNewRmaAgent();
+		addAndStartAgentAtMainContainer("rma", _rmaAgent);
+		_rmaAgent.getContentManager().registerLanguage(new SLCodec());
+		_rmaAgent.getContentManager()
+				.registerOntology(JADEManagementOntology.getInstance());
+	}
+
+	private ControllerPanal() throws StaleProxyException {
+		setupRuntime();
+		setupMainContainer();
+
+		// TODO needed?
+		ProfileImpl pContainer = new ProfileImpl(null, 1200, null);
+		_agentContainer = _runtime.createAgentContainer(pContainer);
+
+		setupRmaAgent();
+		setupSniffer();
+
+	}
+
+	private static ACLMessage createRequestMessage() {
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg.setLanguage(new SLCodec().getName());
 		msg.setOntology(JADEManagementOntology.getInstance().getName());
-		sniffer.getContentManager().registerLanguage(new SLCodec());
-		sniffer.getContentManager()
-				.registerOntology(JADEManagementOntology.getInstance());
-		Action act = new Action(address, sniffOn);
-		sniffer.getContentManager().fillContent(msg, act);
-		msg.addReceiver(sniffer.getAID());
-		sniffer.send(msg);
+		return msg;
+	}
+
+	private static rma getNewRmaAgent() {
+		return new rma();
+	}
+
+	private static Sniffer getNewSnifferAgent() {
+		return new Sniffer();
+	}
+
+	public void close() {
+		_runtime.shutDown();
 
 	}
 
