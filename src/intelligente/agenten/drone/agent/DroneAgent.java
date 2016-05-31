@@ -18,13 +18,16 @@ public class DroneAgent extends Agent {
 		_droneBehaviour = getDroneBehaviour(behaviour);
 	}
 
+	public Drone getDrone() {
+		return _drone;
+	}
+
 	private DroneBehaviour getDroneBehaviour(Behaviours behaviour) {
-		long gameSettingPeriode = 1;
+		long gameSettingPeriode = 1000;
 		LinearDroneBehaviour droneBehaviour = null;
 		switch (behaviour) {
 			case LINEAR_DRONE_BEHAVIOUR :
-				droneBehaviour = new LinearDroneBehaviour(this,
-						gameSettingPeriode);
+				droneBehaviour = new LinearDroneBehaviour(this, gameSettingPeriode);
 				break;
 
 			default :

@@ -21,8 +21,9 @@ public class MapGraphicsPanel extends JPanel {
 		}
 	}
 
-	public MapGraphicsPanel(int width, int height) {
-		setSize(width, height);
+	public MapGraphicsPanel(int x, int y, int width, int height) {
+		setBounds(x, y, width, height);
+		// setSize(width, height);
 		createEmptyImage();
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -38,6 +39,18 @@ public class MapGraphicsPanel extends JPanel {
 
 		drawLine(x - 4, y + 4, x + 4, y - 4, color);
 		drawLine(x - 4, y - 4, x + 4, y + 4, color);
+	}
+
+	public void drawText(String textToDraw, int x, int y, Color color) {
+		Graphics2D g2d = (Graphics2D) _image.getGraphics();
+		g2d.setColor(color);
+		g2d.drawString(textToDraw, x, y);
+		repaint();
+	}
+
+	public void drawCrossWithLable(String textToDraw, int x, int y, Color color) {
+		drawCross(x, y, color);
+		drawText(textToDraw, x - textToDraw.length() * 3, y - 5, color);
 	}
 
 	private void createEmptyImage() {

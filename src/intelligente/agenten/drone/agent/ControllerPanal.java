@@ -1,5 +1,9 @@
 package intelligente.agenten.drone.agent;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
@@ -25,26 +29,27 @@ public class ControllerPanal {
 	public rma _rmaAgent;
 	public AgentContainer _agentContainer;
 	public Sniffer _sniffer;
+	public List<DroneAgent> _allDroneAgents;
 
-	public static ControllerPanal createControllerPanal()
-			throws StaleProxyException {
+	public static ControllerPanal createControllerPanal() throws StaleProxyException {
 		return new ControllerPanal();
 	}
 
-	public void addAndStartAgentAtMainContainer(String name, Agent agendToAdd)
-			throws StaleProxyException {
-		AgentController rmaController = _mainContainer.acceptNewAgent(name,
-				agendToAdd);
+	public void addAndStartAgentAtMainContainer(String name, Agent agendToAdd) throws StaleProxyException {
+		AgentController rmaController = _mainContainer.acceptNewAgent(name, agendToAdd);
 		rmaController.start();
+
+		if (agendToAdd instanceof DroneAgent) {
+			_allDroneAgents.add((DroneAgent) agendToAdd);
+		}
 	}
 
-	private void setupSniffer() throws StaleProxyException {
-		_sniffer = ControllerPanal.getNewSnifferAgent();
-		addAndStartAgentAtMainContainer("sniffer", _sniffer);
+	public void close() {
+		_runtime.shutDown();
+
 	}
 
-	public void addAgentToSnifferByName(String agentName)
-			throws CodecException, OntologyException {
+	public void addAgentToSnifferByName(String agentName) throws CodecException, OntologyException {
 		AID addressToAgentToSniff = new AID();
 		addressToAgentToSniff.setName(agentName);
 		SniffOn sniffOn = createSniffOn(addressToAgentToSniff);
@@ -58,42 +63,19 @@ public class ControllerPanal {
 		_rmaAgent.send(msg);
 	}
 
+	public List<DroneAgent> getAllAgents() {
+		return _allDroneAgents;
+	}
+
+	public int getNewDroneID() {
+		return _allDroneAgents.size() + 1;
+	}
+
 	private SniffOn createSniffOn(AID address) {
 		SniffOn sniffOn = new SniffOn();
 		sniffOn.addSniffedAgents(address);
 		sniffOn.setSniffer(_sniffer.getAID());
 		return sniffOn;
-	}
-
-	private void setupMainContainer() {
-		Profile profile = new ProfileImpl(null, 1200, null);
-		_mainContainer = _runtime.createMainContainer(profile);
-	}
-
-	private void setupRuntime() {
-		_runtime = Runtime.instance();
-		_runtime.setCloseVM(true);
-	}
-
-	private void setupRmaAgent() throws StaleProxyException {
-		_rmaAgent = getNewRmaAgent();
-		addAndStartAgentAtMainContainer("rma", _rmaAgent);
-		_rmaAgent.getContentManager().registerLanguage(new SLCodec());
-		_rmaAgent.getContentManager()
-				.registerOntology(JADEManagementOntology.getInstance());
-	}
-
-	private ControllerPanal() throws StaleProxyException {
-		setupRuntime();
-		setupMainContainer();
-
-		// TODO needed?
-		ProfileImpl pContainer = new ProfileImpl(null, 1200, null);
-		_agentContainer = _runtime.createAgentContainer(pContainer);
-
-		setupRmaAgent();
-		setupSniffer();
-
 	}
 
 	private static ACLMessage createRequestMessage() {
@@ -111,8 +93,39 @@ public class ControllerPanal {
 		return new Sniffer();
 	}
 
-	public void close() {
-		_runtime.shutDown();
+	private void setupSniffer() throws StaleProxyException {
+		_sniffer = ControllerPanal.getNewSnifferAgent();
+		addAndStartAgentAtMainContainer("sniffer", _sniffer);
+	}
+
+	private void setupMainContainer() {
+		Profile profile = new ProfileImpl(null, 1200, null);
+		_mainContainer = _runtime.createMainContainer(profile);
+	}
+
+	private void setupRuntime() {
+		_runtime = Runtime.instance();
+		_runtime.setCloseVM(true);
+	}
+
+	private void setupRmaAgent() throws StaleProxyException {
+		_rmaAgent = getNewRmaAgent();
+		addAndStartAgentAtMainContainer("rma", _rmaAgent);
+		_rmaAgent.getContentManager().registerLanguage(new SLCodec());
+		_rmaAgent.getContentManager().registerOntology(JADEManagementOntology.getInstance());
+	}
+
+	private ControllerPanal() throws StaleProxyException {
+		_allDroneAgents = Lists.newArrayList();
+		setupRuntime();
+		setupMainContainer();
+
+		// TODO needed?
+		ProfileImpl pContainer = new ProfileImpl(null, 1200, null);
+		_agentContainer = _runtime.createAgentContainer(pContainer);
+
+		setupRmaAgent();
+		setupSniffer();
 
 	}
 
