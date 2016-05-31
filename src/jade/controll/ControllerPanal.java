@@ -1,9 +1,10 @@
-package intelligente.agenten.drone.agent;
+package jade.controll;
 
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import agent.DroneAgent;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;

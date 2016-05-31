@@ -1,20 +1,20 @@
-package intelligente.agenten.drone.movement;
+package drone.movement;
 
-public class Vector {
+public class DroneVector {
 
 	private double _xValue;
 	private double _yValue;
 
-	public Vector(double xValue, double yValue) {
+	public DroneVector(double xValue, double yValue) {
 		_xValue = xValue;
 		_yValue = yValue;
 	}
 
-	public static Vector getCopyOfVector(Vector toCopy) {
-		return new Vector(toCopy);
+	public static DroneVector getCopyOfDroneVector(DroneVector toCopy) {
+		return new DroneVector(toCopy);
 	}
 
-	private Vector(Vector a) {
+	private DroneVector(DroneVector a) {
 		_xValue = a.getXValue();
 		_yValue = a.getYValue();
 	}
@@ -32,18 +32,18 @@ public class Vector {
 		return _yValue;
 	}
 
-	public Vector multiplyByScalar(double scalar) {
+	public DroneVector multiplyByScalar(double scalar) {
 		_xValue = _xValue * scalar;
 		_yValue = _yValue * scalar;
 		return this;
 	}
 
-	public Vector getUnitVector() {
+	public DroneVector getUnitDroneVector() {
 		double magnitude = getMagnitude();
 		if (magnitude == 0) {
-			return new Vector(0, 0);
+			return new DroneVector(0, 0);
 		}
-		return new Vector(_xValue / magnitude, _yValue / magnitude);
+		return new DroneVector(_xValue / magnitude, _yValue / magnitude);
 	}
 
 	public boolean isZeroVector() {
@@ -54,26 +54,26 @@ public class Vector {
 		return Math.sqrt(Math.pow(_xValue, 2) + Math.pow(_yValue, 2));
 	}
 
-	public Vector calculateAddVector(Vector toAdd) {
-		return new Vector(_xValue + toAdd.getXValue(), _yValue + toAdd.getYValue());
+	public DroneVector calculateAddDroneVector(DroneVector toAdd) {
+		return new DroneVector(_xValue + toAdd.getXValue(), _yValue + toAdd.getYValue());
 	}
 
-	public Vector calculateSubtractionVector(Vector toSub) {
-		return new Vector(_xValue - toSub.getXValue(), _yValue - toSub.getYValue());
+	public DroneVector calculateSubtractionDroneVector(DroneVector toSub) {
+		return new DroneVector(_xValue - toSub.getXValue(), _yValue - toSub.getYValue());
 	}
 
-	public Vector calculatePositionByDestinationAndSpeed(Vector destination, double speed) {
-		Vector directionVector = destination.calculateSubtractionVector(this);
+	public DroneVector calculatePositionByDestinationAndSpeed(DroneVector destination, double speed) {
+		DroneVector directionDroneVector = destination.calculateSubtractionDroneVector(this);
 
 		// destination reached
-		if (directionVector.getMagnitude() <= speed) {
-			return getCopyOfVector(destination);
+		if (directionDroneVector.getMagnitude() <= speed) {
+			return getCopyOfDroneVector(destination);
 		}
 
-		Vector unitDirectionVector = directionVector.getUnitVector().multiplyByScalar(speed);
+		DroneVector unitDirectionDroneVector = directionDroneVector.getUnitDroneVector().multiplyByScalar(speed);
 
 		// new position
-		return unitDirectionVector.calculateAddVector(this);
+		return unitDirectionDroneVector.calculateAddDroneVector(this);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class Vector {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Vector other = (Vector) obj;
+		DroneVector other = (DroneVector) obj;
 		if (Double.doubleToLongBits(_xValue) != Double.doubleToLongBits(other._xValue))
 			return false;
 		if (Double.doubleToLongBits(_yValue) != Double.doubleToLongBits(other._yValue))

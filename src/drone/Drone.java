@@ -1,8 +1,8 @@
-package intelligente.agenten.drone;
+package drone;
 
 import java.util.List;
 
-import intelligente.agenten.drone.movement.Vector;
+import drone.movement.DroneVector;
 
 public abstract class Drone {
 
@@ -10,11 +10,11 @@ public abstract class Drone {
 	private final int MAX_LOAD;
 	private final double MAX_SPEED;
 	private List<Integer> _loaded;
-	private Vector _destination;
-	private Vector _dronePosition;
-	private Vector _homeStation;
+	private DroneVector _destination;
+	private DroneVector _dronePosition;
+	private DroneVector _homeStation;
 
-	Drone(int droneId, int maxLoad, double maxSpeed, Vector droneStartPoint) {
+	Drone(int droneId, int maxLoad, double maxSpeed, DroneVector droneStartPoint) {
 		DRONE_ID = droneId;
 		MAX_LOAD = maxLoad;
 		MAX_SPEED = maxSpeed;
@@ -22,19 +22,19 @@ public abstract class Drone {
 		_homeStation = droneStartPoint;
 	}
 
-	public void setHomeSation(Vector homeStation) {
+	public void setHomeSation(DroneVector homeStation) {
 		_homeStation = homeStation;
 	}
 
-	public Vector getHomeStation() {
+	public DroneVector getHomeStation() {
 		return _homeStation;
 	}
 
-	public Vector getDronePosition() {
+	public DroneVector getDronePosition() {
 		return _dronePosition;
 	}
 
-	public void setJob(Vector destination) {
+	public void setJob(DroneVector destination) {
 		// TODO a real job, including warehouse station, ID list and destination
 		_destination = destination;
 	}

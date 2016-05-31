@@ -1,4 +1,4 @@
-package intelligente.agenten.gui;
+package gui;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -10,14 +10,14 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import intelligente.agenten.drone.Drone;
-import intelligente.agenten.drone.Quadrocopter;
-import intelligente.agenten.drone.agent.ControllerPanal;
-import intelligente.agenten.drone.agent.DroneAgent;
-import intelligente.agenten.drone.movement.Vector;
+import agent.DroneAgent;
+import drone.Drone;
+import drone.Quadrocopter;
+import drone.movement.DroneVector;
 import intelligente.agenten.jade.HelloWorld;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
+import jade.controll.ControllerPanal;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
@@ -63,7 +63,7 @@ public class GuiMain extends JFrame {
 			_graphicsPanel.clear();
 			List<DroneAgent> allAgents = _controllerPanal.getAllAgents();
 			for (DroneAgent drone : allAgents) {
-				Vector dronePosition = drone.getDrone().getDronePosition();
+				DroneVector dronePosition = drone.getDrone().getDronePosition();
 				System.out.println("drawing " + drone.getName() + " to " + (int) dronePosition.getXValue() + ", "
 						+ (int) dronePosition.getYValue());
 				_graphicsPanel.drawCrossWithLable(drone.getLocalName(), (int) dronePosition.getXValue(),
@@ -79,7 +79,7 @@ public class GuiMain extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				int droneID = _controllerPanal.getNewDroneID();
-				Drone drone = new Quadrocopter(droneID, 20, 10.0, new Vector(0, 0));
+				Drone drone = new Quadrocopter(droneID, 20, 10.0, new DroneVector(0, 0));
 				DroneAgent droneAgent = new DroneAgent(drone, DroneAgent.Behaviours.LINEAR_DRONE_BEHAVIOUR);
 				try {
 

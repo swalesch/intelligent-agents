@@ -1,7 +1,7 @@
-package intelligente.agenten.drone.agent;
+package agent;
 
-import intelligente.agenten.drone.Drone;
-import intelligente.agenten.drone.movement.Vector;
+import drone.Drone;
+import drone.movement.DroneVector;
 
 public class LinearDroneBehaviour extends DroneBehaviour {
 
@@ -14,10 +14,10 @@ public class LinearDroneBehaviour extends DroneBehaviour {
 		_droneAgent.getDrone().setJob(createRandomJobForTesting());
 	}
 
-	private Vector createRandomJobForTesting() {
+	private DroneVector createRandomJobForTesting() {
 		int x = 0 + (int) (Math.random() * 600);
 		int y = 0 + (int) (Math.random() * 600);
-		return new Vector(x, y);
+		return new DroneVector(x, y);
 
 	}
 

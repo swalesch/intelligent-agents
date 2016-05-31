@@ -1,4 +1,4 @@
-package intelligente.agenten.drone.agent;
+package agent;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;

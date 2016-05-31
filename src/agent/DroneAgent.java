@@ -1,6 +1,6 @@
-package intelligente.agenten.drone.agent;
+package agent;
 
-import intelligente.agenten.drone.Drone;
+import drone.Drone;
 import jade.core.Agent;
 
 public class DroneAgent extends Agent {
