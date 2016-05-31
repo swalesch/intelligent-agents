@@ -2,9 +2,8 @@ package jade.controll;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-import agent.DroneAgent;
+import agent.controller.ControllAgent;
+import agent.drone.DroneAgent;
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.OntologyException;
@@ -30,19 +29,22 @@ public class ControllerPanal {
 	public rma _rmaAgent;
 	public AgentContainer _agentContainer;
 	public Sniffer _sniffer;
-	public List<DroneAgent> _allDroneAgents;
+	public ControllAgent _controllAgent;
 
 	public static ControllerPanal createControllerPanal() throws StaleProxyException {
 		return new ControllerPanal();
 	}
 
-	public void addAndStartAgentAtMainContainer(String name, Agent agendToAdd) throws StaleProxyException {
-		AgentController rmaController = _mainContainer.acceptNewAgent(name, agendToAdd);
+	public void addAndStartAgentAtMainContainer(String name, Agent agentToAdd) throws StaleProxyException {
+
+		if (agentToAdd instanceof DroneAgent) {
+			DroneAgent droneAgent = (DroneAgent) agentToAdd;
+			droneAgent.setControllAgent(_controllAgent);
+			_controllAgent.addDroneAgent(droneAgent);
+		}
+		AgentController rmaController = _mainContainer.acceptNewAgent(name, agentToAdd);
 		rmaController.start();
 
-		if (agendToAdd instanceof DroneAgent) {
-			_allDroneAgents.add((DroneAgent) agendToAdd);
-		}
 	}
 
 	public void close() {
@@ -65,11 +67,11 @@ public class ControllerPanal {
 	}
 
 	public List<DroneAgent> getAllAgents() {
-		return _allDroneAgents;
+		return _controllAgent.getallDroneAgents();
 	}
 
 	public int getNewDroneID() {
-		return _allDroneAgents.size() + 1;
+		return _controllAgent.getallDroneAgents().size() + 1;
 	}
 
 	private SniffOn createSniffOn(AID address) {
@@ -116,8 +118,20 @@ public class ControllerPanal {
 		_rmaAgent.getContentManager().registerOntology(JADEManagementOntology.getInstance());
 	}
 
+	private void setupControllAgent() {
+		ControllAgent controllAgent = new ControllAgent();
+		try {
+			addAndStartAgentAtMainContainer("Controll Agent", controllAgent);
+			addAgentToSnifferByName(controllAgent.getName());
+			_controllAgent = controllAgent;
+		} catch (StaleProxyException | CodecException | OntologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	private ControllerPanal() throws StaleProxyException {
-		_allDroneAgents = Lists.newArrayList();
 		setupRuntime();
 		setupMainContainer();
 
@@ -127,6 +141,7 @@ public class ControllerPanal {
 
 		setupRmaAgent();
 		setupSniffer();
+		setupControllAgent();
 
 	}
 

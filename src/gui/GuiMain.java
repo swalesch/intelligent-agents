@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import agent.DroneAgent;
+import agent.drone.DroneAgent;
 import drone.Drone;
 import drone.Quadrocopter;
 import drone.movement.DroneVector;
@@ -64,8 +64,6 @@ public class GuiMain extends JFrame {
 			List<DroneAgent> allAgents = _controllerPanal.getAllAgents();
 			for (DroneAgent drone : allAgents) {
 				DroneVector dronePosition = drone.getDrone().getDronePosition();
-				System.out.println("drawing " + drone.getName() + " to " + (int) dronePosition.getXValue() + ", "
-						+ (int) dronePosition.getYValue());
 				_graphicsPanel.drawCrossWithLable(drone.getLocalName(), (int) dronePosition.getXValue(),
 						(int) dronePosition.getYValue(), Color.BLACK);
 			}
