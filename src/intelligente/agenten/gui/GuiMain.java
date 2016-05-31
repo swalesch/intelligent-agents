@@ -1,4 +1,4 @@
-package intelligente.agenten.drohnen;
+package intelligente.agenten.gui;
 
 import java.awt.Color;
 import java.awt.event.WindowEvent;
@@ -7,6 +7,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import intelligente.agenten.drone.agent.ControllerPanal;
 import intelligente.agenten.jade.HelloWorld;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
@@ -19,6 +20,7 @@ public class GuiMain extends JFrame {
 	private static final long serialVersionUID = 5845195683189476922L;
 	public static JFrame _mainFrame;
 	private static ControllerPanal _controllerPanal;
+	private static MapGraphicsPanel _graphicsPanel;
 
 	public static void main(String[] args) throws CodecException, OntologyException, StaleProxyException {
 		_mainFrame = new JFrame();
@@ -32,11 +34,13 @@ public class GuiMain extends JFrame {
 		_mainFrame.setVisible(true);
 		_mainFrame.addWindowListener(getWindowListener());
 
-		GraphicsPanel graphicsPanel = new GraphicsPanel(100, 100);
-		jPanel.add(graphicsPanel);
-		graphicsPanel.drawLine(0, 0, 100, 100, Color.BLACK);
-		graphicsPanel.drawLine(0, 100, 100, 0, Color.RED);
-		graphicsPanel.drawCross(20, 40, Color.GREEN);
+		_graphicsPanel = new MapGraphicsPanel(600, 600);
+		jPanel.add(_graphicsPanel);
+		_graphicsPanel.drawLine(0, 0, 100, 100, Color.BLACK);
+		_graphicsPanel.drawLine(0, 100, 100, 0, Color.RED);
+		_graphicsPanel.drawCross(20, 40, Color.GREEN);
+
+		setupAgentController();
 
 	}
 

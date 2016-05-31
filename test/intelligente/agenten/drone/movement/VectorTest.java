@@ -1,10 +1,10 @@
-package intelligente.agenten.drohne;
+package intelligente.agenten.drone.movement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-import intelligente.agenten.drohnen.Vector;
+import intelligente.agenten.drone.movement.Vector;
 
 public class VectorTest {
     @Test

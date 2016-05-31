@@ -1,4 +1,4 @@
-package intelligente.agenten.drohnen;
+package intelligente.agenten.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public class GraphicsPanel extends JPanel {
+public class MapGraphicsPanel extends JPanel {
 	private static final long serialVersionUID = 6689198061018337620L;
 
 	private BufferedImage _image;
@@ -21,7 +21,7 @@ public class GraphicsPanel extends JPanel {
 		}
 	}
 
-	public GraphicsPanel(int width, int height) {
+	public MapGraphicsPanel(int width, int height) {
 		setSize(width, height);
 		createEmptyImage();
 		setBackground(Color.WHITE);

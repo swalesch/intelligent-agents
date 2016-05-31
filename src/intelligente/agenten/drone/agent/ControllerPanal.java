@@ -1,4 +1,4 @@
-package intelligente.agenten.drohnen;
+package intelligente.agenten.drone.agent;
 
 import jade.content.lang.Codec.CodecException;
 import jade.content.lang.sl.SLCodec;
