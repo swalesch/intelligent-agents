@@ -61,4 +61,19 @@ public class MapGraphicsPanel extends JPanel {
 	public void clear() {
 		createEmptyImage();
 	}
+
+	public void drawWarhouse(int x, int y, Color color) {
+		Graphics2D g2d = (Graphics2D) _image.getGraphics();
+		g2d.setColor(color);
+		g2d.drawRect(x, y, 6, 6);
+		repaint();
+	}
+
+	public void drawJobDestiantion(int x, int y, Color color) {
+		Graphics2D g2d = (Graphics2D) _image.getGraphics();
+		g2d.setColor(color);
+		g2d.drawOval(x, y, 6, 6);
+		repaint();
+
+	}
 }

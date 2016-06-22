@@ -14,13 +14,14 @@ import agent.drone.DroneAgent;
 import drone.Drone;
 import drone.Quadrocopter;
 import drone.movement.DroneVector;
-import intelligente.agenten.jade.HelloWorld;
 import jade.content.lang.Codec.CodecException;
 import jade.content.onto.OntologyException;
 import jade.controll.ControllerPanal;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
+import job.itemlist.ItemList;
+import job.warhouse.WarhouseList;
 
 public class GuiMain extends JFrame {
 
@@ -29,7 +30,8 @@ public class GuiMain extends JFrame {
 	private static ControllerPanal _controllerPanal;
 	private static MapGraphicsPanel _graphicsPanel;
 
-	public static void main(String[] args) throws CodecException, OntologyException, StaleProxyException {
+	public static void main(String[] args)
+			throws CodecException, OntologyException, StaleProxyException, InterruptedException {
 		_mainFrame = new JFrame();
 		_mainFrame.setTitle("Intelligente Dronen");
 		_mainFrame.setSize(800, 600);
@@ -47,25 +49,37 @@ public class GuiMain extends JFrame {
 		button.setBounds(600, 0, 100, 30);
 		_mainFrame.add(button);
 
+		ItemList.createRandomListWithXItems(15);
+		WarhouseList.createNRandomWarhouses(3, 600, 600);
 		setupAgentController();
 
 		paintDronePosition();
 	}
 
-	private static void paintDronePosition() {
+	private static void paintDronePosition() throws InterruptedException {
 		while (true) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			Thread.sleep(1000);
 			_graphicsPanel.clear();
+
+			List<DroneVector> allWarhouseLocations = WarhouseList.getAllLocations();
+			for (DroneVector warhouse : allWarhouseLocations) {
+				_graphicsPanel.drawWarhouse((int) warhouse.getXValue(), (int) warhouse.getYValue(), Color.RED);
+			}
+
 			List<DroneAgent> allAgents = _controllerPanal.getAllAgents();
 			for (DroneAgent drone : allAgents) {
 				DroneVector dronePosition = drone.getDrone().getDronePosition();
 				_graphicsPanel.drawCrossWithLable(drone.getLocalName(), (int) dronePosition.getXValue(),
 						(int) dronePosition.getYValue(), Color.BLACK);
+			}
+
+			for (DroneAgent drone : allAgents) {
+				if (drone.getDrone().hasJob()) {
+					DroneVector jobDestination = drone.getDrone().getJob().getDestination();
+					_graphicsPanel.drawJobDestiantion((int) jobDestination.getXValue(),
+							(int) jobDestination.getYValue(), Color.BLUE);
+				}
+
 			}
 		}
 
@@ -77,18 +91,15 @@ public class GuiMain extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				int droneID = _controllerPanal.getNewDroneID();
-				Drone drone = new Quadrocopter(droneID, 20, 10.0, new DroneVector(0, 0));
+				Drone drone = new Quadrocopter(droneID, 50, 10.0, new DroneVector(0, 0));
 				DroneAgent droneAgent = new DroneAgent(drone, DroneAgent.Behaviours.LINEAR_DRONE_BEHAVIOUR);
 				try {
-
 					_controllerPanal.addAndStartAgentAtMainContainer("Drone " + droneID, droneAgent);
 					_controllerPanal.addAgentToSnifferByName(droneAgent.getName());
 
 				} catch (StaleProxyException | CodecException | OntologyException exeption) {
-					// TODO Auto-generated catch block
 					exeption.printStackTrace();
 				}
-
 			}
 		};
 	}
@@ -104,14 +115,8 @@ public class GuiMain extends JFrame {
 			AgentController dfAgentController = _controllerPanal._mainContainer.getAgent("df");
 			_controllerPanal.addAgentToSnifferByName(dfAgentController.getName());
 		} catch (ControllerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		HelloWorld anAgent = new HelloWorld();
-		_controllerPanal.addAndStartAgentAtMainContainer("HalloWorld", anAgent);
-		_controllerPanal.addAgentToSnifferByName(anAgent.getName());
-
 	}
 
 	private static WindowListener getWindowListener() {
