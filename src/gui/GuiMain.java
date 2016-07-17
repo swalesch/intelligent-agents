@@ -9,6 +9,9 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import agent.drone.DroneAgent;
 import drone.Drone;
@@ -29,6 +32,8 @@ public class GuiMain extends JFrame {
 	public static JFrame _mainFrame;
 	private static ControllerPanal _controllerPanal;
 	private static MapGraphicsPanel _graphicsPanel;
+	private static JTextField _load;
+	private static JTextField _speed;
 
 	public static void main(String[] args)
 			throws CodecException, OntologyException, StaleProxyException, InterruptedException {
@@ -44,16 +49,37 @@ public class GuiMain extends JFrame {
 		_graphicsPanel = new MapGraphicsPanel(0, 0, 600, 600);
 		_mainFrame.add(_graphicsPanel);
 
-		JButton button = new JButton("Add Drone");
-		button.addActionListener(simplebuttonActionAddDrone());
-		button.setBounds(600, 0, 100, 30);
-		_mainFrame.add(button);
+		addDroneGuiObjects();
 
 		ItemList.createRandomListWithXItems(15);
 		WarhouseList.createNRandomWarhouses(3, 600, 600);
 		setupAgentController();
 
 		paintDronePosition();
+	}
+
+	private static void addDroneGuiObjects() {
+		JButton button = new JButton("Add Drone");
+		button.addActionListener(simplebuttonActionAddDrone());
+		button.setBounds(600, 0, 100, 30);
+		_mainFrame.add(button);
+
+		JLabel maxLoad = new JLabel("Max Load:");
+		maxLoad.setBounds(600, 30, 100, 30);
+		_mainFrame.add(maxLoad);
+
+		_load = new JTextField();
+		_load.setBounds(600, 60, 100, 30);
+		_mainFrame.add(_load);
+
+		JLabel maxSpeed = new JLabel("Max Speed:");
+		maxSpeed.setBounds(600, 90, 100, 30);
+		_mainFrame.add(maxSpeed);
+
+		_speed = new JTextField();
+		_speed.setBounds(600, 120, 100, 30);
+		_mainFrame.add(_speed);
+
 	}
 
 	private static void paintDronePosition() throws InterruptedException {
@@ -91,17 +117,30 @@ public class GuiMain extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				int droneID = _controllerPanal.getNewDroneID();
-				Drone drone = new Quadrocopter(droneID, 50, 10.0, new DroneVector(0, 0));
-				DroneAgent droneAgent = new DroneAgent(drone, DroneAgent.Behaviours.LINEAR_DRONE_BEHAVIOUR);
+
 				try {
+					Drone drone = new Quadrocopter(droneID, getLoad(), getSpeed(), new DroneVector(0, 0));
+					DroneAgent droneAgent = new DroneAgent(drone, DroneAgent.Behaviours.LINEAR_DRONE_BEHAVIOUR);
 					_controllerPanal.addAndStartAgentAtMainContainer("Drone " + droneID, droneAgent);
 					_controllerPanal.addAgentToSnifferByName(droneAgent.getName());
 
 				} catch (StaleProxyException | CodecException | OntologyException exeption) {
 					exeption.printStackTrace();
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(_mainFrame, "Illegal argument \n" + e.getMessage(), "Input Error",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
+
 		};
+	}
+
+	private static double getSpeed() throws NumberFormatException {
+		return Double.parseDouble(_speed.getText());
+	}
+
+	private static int getLoad() throws NumberFormatException {
+		return Integer.parseInt(_load.getText());
 	}
 
 	private static void setupAgentController() throws StaleProxyException, CodecException, OntologyException {

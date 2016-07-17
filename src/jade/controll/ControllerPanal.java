@@ -39,7 +39,7 @@ public class ControllerPanal {
 
 		if (agentToAdd instanceof DroneAgent) {
 			DroneAgent droneAgent = (DroneAgent) agentToAdd;
-			droneAgent.setControllAgent(_controllAgent);
+			droneAgent.setControllAgent(_controllAgent.getAID());
 			_controllAgent.addDroneAgent(droneAgent);
 		}
 		AgentController rmaController = _mainContainer.acceptNewAgent(name, agentToAdd);

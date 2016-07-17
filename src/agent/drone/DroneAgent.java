@@ -1,7 +1,7 @@
 package agent.drone;
 
-import agent.controller.ControllAgent;
 import drone.Drone;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 
@@ -9,7 +9,7 @@ public class DroneAgent extends Agent {
 
 	private final Drone _drone;
 	private final DroneBehaviour _droneBehaviour;
-	private ControllAgent _controllAgent;
+	private AID _controllAgentID;
 
 	public enum Behaviours {
 		LINEAR_DRONE_BEHAVIOUR
@@ -20,22 +20,22 @@ public class DroneAgent extends Agent {
 		_drone = drone;
 		_droneBehaviour = getDroneBehaviour(behaviour);
 	}
-	public void setControllAgent(ControllAgent controllAgent) {
-		_controllAgent = controllAgent;
+	public void setControllAgent(AID controllAgent) {
+		_controllAgentID = controllAgent;
 	}
 
 	public Drone getDrone() {
 		return _drone;
 	}
 
-	public ControllAgent getControllAgent() {
-		return _controllAgent;
+	public AID getControllAgent() {
+		return _controllAgentID;
 	}
 
 	public void sendStatusToControllAgent(String status) {
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setContent(status);
-		msg.addReceiver(_controllAgent.getAID());
+		msg.addReceiver(_controllAgentID);
 		send(msg);
 	}
 
